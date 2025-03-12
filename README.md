@@ -28,7 +28,7 @@ This project combines Tesseract OCR with LLaMA Vision (via Groq API) to create a
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/advanced-ocr-system.git
+   git clone https://github.com/Notmeher/Advanced-OCR-System-with-Tesseract-LLaMA-Vision.git
    cd advanced-ocr-system
    ```
 
