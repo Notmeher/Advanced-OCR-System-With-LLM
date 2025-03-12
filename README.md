@@ -13,7 +13,8 @@ This project combines Tesseract OCR with LLaMA Vision (via Groq API) to create a
 ## Demo
 ![screencapture-localhost-8501-2025-03-12-14_24_27](https://github.com/user-attachments/assets/8b516b1c-3c7b-4f00-beb8-7d003d1dedf2)
 
-![screencapture-localhost-8501-2025-03-12-14_17_25](https://github.com/user-attachments/assets/33624856-8d47-497c-89ed-7f7530c8e8a9)
+![screencapture-localhost-8501-2025-03-12-14_39_13](https://github.com/user-attachments/assets/04a790a7-e402-483a-b4d8-c8c470613a48)
+
 
 
 ## How It Works
