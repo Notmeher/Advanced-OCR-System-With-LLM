@@ -1,115 +1,142 @@
-# Advanced OCR System with Tesseract & LLaMA Vision
 
-This project combines Tesseract OCR with LLaMA Vision (via Groq API) to create an advanced OCR system that can extract and refine text from images. The system uses Streamlit for a user-friendly interface.
+# OCR Enhancement System with LLaMA Vision
 
-## Features
+This repository contains three implementations of an advanced OCR (Optical Character Recognition) system that uses multimodal AI models to improve text extraction from images and PDFs:
 
-- **Image Preprocessing**: Apply grayscale conversion, contrast enhancement, and noise reduction
-- **Text Region Detection**: Automatically detect text regions in the image
-- **OCR Text Extraction**: Extract text using Tesseract OCR
-- **Text Refinement**: Refine extracted text using LLaMA Vision's contextual understanding
-- **User-friendly Interface**: Easy-to-use web interface with Streamlit
+1. **Flask Web Application**: A full-featured web interface for processing both images and PDFs with OCR enhancement
+2. **Streamlit + LLaMA Vision**: A streamlined web app using only LLaMA Vision for direct image-to-text extraction
+3. **Streamlit + Tesseract + LLaMA Vision**: A hybrid approach combining traditional OCR with AI refinement
 
-## Demo
-![screencapture-localhost-8501-2025-03-12-14_24_27](https://github.com/user-attachments/assets/8b516b1c-3c7b-4f00-beb8-7d003d1dedf2)
+## Overview
 
-![screencapture-localhost-8501-2025-03-12-14_39_13](https://github.com/user-attachments/assets/04a790a7-e402-483a-b4d8-c8c470613a48)
+All three implementations share a common goal: to extract text from images or documents with higher accuracy than traditional OCR alone. They leverage vision-language models (VLMs) to refine and correct text extraction by analyzing both the visual content and initial OCR output.
 
+### Key Features
 
-
-## How It Works
-
-1. **Upload an image** containing text
-2. **Configure preprocessing options** and OCR settings in the sidebar
-3. **Process the image** to extract text using Tesseract
-4. **Refine the extracted text** using LLaMA Vision
-5. **Download the results** as text files
+- **Image preprocessing** options (grayscale conversion, contrast enhancement, noise reduction)
+- **Multimodal AI refinement** using LLaMA Vision models via Groq API
+- **PDF support** (in Flask app) with automatic page extraction and processing
+- **User-friendly web interfaces** for easy usage
+- **Customizable prompts** to guide the AI refinement process
 
 ## Installation
 
+### Prerequisites
+
+- Python 3.8+ 
+- [Groq API key](https://console.groq.com/keys)
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (for the Tesseract-based implementation)
+
+### Setup
+
 1. Clone this repository:
-   ```bash
-   git clone https://github.com/Notmeher/Advanced-OCR-System-with-Tesseract-LLaMA-Vision.git
-   cd advanced-ocr-system
-   ```
+```bash
+git clone https://github.com/yourusername/ocr-enhancement-system.git
+cd ocr-enhancement-system
+```
 
-2. Install required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-3. Install Tesseract OCR:
-   - **Ubuntu/Debian**: `sudo apt-get install tesseract-ocr`
-   - **Windows**: Download from [GitHub Releases](https://github.com/UB-Mannheim/tesseract/wiki)
-   - **macOS**: `brew install tesseract`
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-4. Create a `.env` file in the project root with your Groq API key:
-   ```
-   GROQ_API_KEY=your_groq_api_key_here
-   ```
+4. Create a `.env` file with your Groq API key:
+```
+GROQ_API_KEY=your_groq_api_key_here
+```
 
 ## Usage
 
-1. Run the Streamlit app:
-   ```bash
-   streamlit run app.py
-   ```
+### Flask Web Application
 
-2. Open your web browser and navigate to `http://localhost:8501`
+The Flask app provides a comprehensive web interface for processing both images and PDFs:
 
-3. Upload an image and adjust settings as needed
+```bash
+python app.py
+```
 
-4. Click "Process Image" to extract and refine text
+Then open your browser to http://127.0.0.1:5000
 
-## Configuration Options
+Features:
+- Upload images or PDF files
+- Process entire PDFs or select specific pages
+- View and download processed text results
+- Configure API key via the interface
 
-### Image Preprocessing
-- **Grayscale**: Convert image to grayscale
-- **Contrast Enhancement**: Improve image contrast
-- **Noise Reduction**: Remove noise from the image
+### Streamlit + LLaMA Vision App
 
-### Tesseract OCR
-- **Language**: Select OCR language (default: English)
-- **Page Segmentation Mode**: Choose how Tesseract segments the page
+This streamlined implementation uses only LLaMA Vision for direct text extraction:
 
-### LLaMA Vision
-- **Prompt Template**: Customize the prompt for text refinement
+```bash
+streamlit run streamlit_llama_app.py
+```
+
+Features:
+- Image preprocessing options
+- Direct image-to-text extraction
+- Customizable prompt templates
+- Immediate preview of results
+
+### Streamlit + Tesseract + LLaMA Vision App
+
+This hybrid implementation combines traditional Tesseract OCR with LLaMA Vision refinement:
+
+```bash
+streamlit run streamlit_tesseract_llama_app.py
+```
+
+Features:
+- Tesseract OCR configuration options
+- Text region detection and visualization
+- Compare raw OCR output with AI-refined text
+- Download both raw and refined results
+
+## Models Used
+
+All implementations use the Groq API to access one of the following models:
+- `meta-llama/llama-4-scout-17b-16e-instruct` (Flask app and Streamlit-only app)
+- `llama-3.2-90b-vision-preview` (Tesseract hybrid app)
+
+These models are designed to understand both visual content and text, allowing them to correct OCR errors with high accuracy.
+
+## Customizing Prompts
+
+Each implementation includes a customizable prompt template that controls how the AI refines the extracted text. The default prompt instructs the model to:
+
+1. Fix misspelled words
+2. Correct misrecognized characters
+3. Preserve original formatting
+4. Handle unclear text based on context
+
+You can modify these prompts to focus on specific aspects of text correction based on your needs.
 
 ## Requirements
 
-- Python 3.7+
-- Tesseract OCR
-- Groq API access (for LLaMA Vision)
-- Required Python packages (see `requirements.txt`)
-
-## Files
-
-- `app.py`: Main Streamlit application
-- `requirements.txt`: Required Python packages
-- `.env`: Environment variables (Groq API key)
-
-## Why Combine Tesseract and LLaMA Vision?
-
-- **Tesseract OCR** is efficient for extracting text from clear images
-- **LLaMA Vision** provides contextual understanding to correct errors and handle ambiguous text
-- The combination offers better accuracy and robustness compared to either alone
-
-## Limitations
-
-- Performance depends on image quality and clarity
-- Requires internet access for LLaMA Vision API
-- Processing large images may take time
-
-## Future Improvements
-
-- Add batch processing for multiple images
-- Implement more advanced preprocessing techniques
-- Add support for additional languages
-- Improve text region detection accuracy
+```
+flask>=2.0.0
+streamlit>=1.22.0
+opencv-python>=4.5.0
+pillow>=9.0.0
+numpy>=1.20.0
+pytesseract>=0.3.9
+groq>=0.4.0
+python-dotenv>=0.19.0
+PyMuPDF>=1.19.0  # For PDF processing in Flask app
+```
 
 ## License
 
-MIT License
+[MIT License](LICENSE)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Acknowledgments
 
@@ -117,3 +144,11 @@ MIT License
 - [Groq API](https://groq.com/)
 - [LLaMA Vision Model](https://llama.meta.ai/)
 - [Streamlit](https://streamlit.io/)
+
+
+
+## Demo
+![screencapture-localhost-8501-2025-03-12-14_24_27](https://github.com/user-attachments/assets/8b516b1c-3c7b-4f00-beb8-7d003d1dedf2)
+
+![screencapture-localhost-8501-2025-03-12-14_39_13](https://github.com/user-attachments/assets/04a790a7-e402-483a-b4d8-c8c470613a48)
+
