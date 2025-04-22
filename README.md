@@ -1,10 +1,9 @@
-
-# OCR Enhancement System with LLaMA Vision
+# OCR Enhancement System with AI Vision Models
 
 This repository contains three implementations of an advanced OCR (Optical Character Recognition) system that uses multimodal AI models to improve text extraction from images and PDFs:
 
-1. **Flask Web Application**: A full-featured web interface for processing both images and PDFs with OCR enhancement
-2. **Streamlit + LLaMA Vision**: A streamlined web app using only LLaMA Vision for direct image-to-text extraction
+1. **Flask Web Application**: A full-featured web interface for processing both images and PDFs with LLaMA Vision
+2. **SmolDockling App**: A specialized solution for code extraction using the SmolDocling model
 3. **Streamlit + Tesseract + LLaMA Vision**: A hybrid approach combining traditional OCR with AI refinement
 
 ## Overview
@@ -14,7 +13,7 @@ All three implementations share a common goal: to extract text from images or do
 ### Key Features
 
 - **Image preprocessing** options (grayscale conversion, contrast enhancement, noise reduction)
-- **Multimodal AI refinement** using LLaMA Vision models via Groq API
+- **Multimodal AI refinement** using LLaMA Vision or SmolDockling models
 - **PDF support** (in Flask app) with automatic page extraction and processing
 - **User-friendly web interfaces** for easy usage
 - **Customizable prompts** to guide the AI refinement process
@@ -24,8 +23,9 @@ All three implementations share a common goal: to extract text from images or do
 ### Prerequisites
 
 - Python 3.8+ 
-- [Groq API key](https://console.groq.com/keys)
+- [Groq API key](https://console.groq.com/keys) (for LLaMA Vision implementations)
 - [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (for the Tesseract-based implementation)
+- PyTorch (for SmolDockling implementation)
 
 ### Setup
 
@@ -46,7 +46,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file with your Groq API key:
+4. Create a `.env` file with your Groq API key (for LLaMA Vision implementations):
 ```
 GROQ_API_KEY=your_groq_api_key_here
 ```
@@ -55,7 +55,7 @@ GROQ_API_KEY=your_groq_api_key_here
 
 ### Flask Web Application
 
-The Flask app provides a comprehensive web interface for processing both images and PDFs:
+The Flask app provides a comprehensive web interface for processing both images and PDFs with LLaMA Vision:
 
 ```bash
 python app.py
@@ -69,19 +69,20 @@ Features:
 - View and download processed text results
 - Configure API key via the interface
 
-### Streamlit + LLaMA Vision App
+### SmolDockling Code OCR App
 
-This streamlined implementation uses only LLaMA Vision for direct text extraction:
+This implementation specializes in extracting code from images using the SmolDockling model:
 
 ```bash
-streamlit run streamlit_llama_app.py
+streamlit run SmolDockling.py
 ```
 
 Features:
-- Image preprocessing options
-- Direct image-to-text extraction
-- Customizable prompt templates
-- Immediate preview of results
+- Process single or multiple code images
+- Downloads and uses the SmolDockling model locally
+- GPU acceleration when available
+- Markdown output with code formatting preserved
+- Batch processing capability for multiple images
 
 ### Streamlit + Tesseract + LLaMA Vision App
 
@@ -99,15 +100,17 @@ Features:
 
 ## Models Used
 
-All implementations use the Groq API to access one of the following models:
-- `meta-llama/llama-4-scout-17b-16e-instruct` (Flask app and Streamlit-only app)
-- `llama-3.2-90b-vision-preview` (Tesseract hybrid app)
+The implementations use different vision-language models:
 
-These models are designed to understand both visual content and text, allowing them to correct OCR errors with high accuracy.
+- **Flask app**: `meta-llama/llama-4-scout-17b-16e-instruct` via Groq API
+- **SmolDockling app**: `ds4sd/SmolDocling-256M-preview` (runs locally)
+- **Tesseract hybrid app**: `llama-3.2-90b-vision-preview` via Groq API
+
+These models are designed to understand both visual content and text, allowing them to correct OCR errors with high accuracy. SmolDockling is specifically optimized for code extraction.
 
 ## Customizing Prompts
 
-Each implementation includes a customizable prompt template that controls how the AI refines the extracted text. The default prompt instructs the model to:
+The LLaMA Vision implementations include customizable prompt templates that control how the AI refines the extracted text. The default prompt instructs the model to:
 
 1. Fix misspelled words
 2. Correct misrecognized characters
@@ -128,6 +131,9 @@ pytesseract>=0.3.9
 groq>=0.4.0
 python-dotenv>=0.19.0
 PyMuPDF>=1.19.0  # For PDF processing in Flask app
+torch>=2.0.0  # For SmolDockling
+transformers>=4.30.0  # For SmolDockling
+docling-core  # For SmolDockling
 ```
 
 ## License
@@ -137,18 +143,3 @@ PyMuPDF>=1.19.0  # For PDF processing in Flask app
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Acknowledgments
-
-- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
-- [Groq API](https://groq.com/)
-- [LLaMA Vision Model](https://llama.meta.ai/)
-- [Streamlit](https://streamlit.io/)
-
-
-
-## Demo
-![screencapture-localhost-8501-2025-03-12-14_24_27](https://github.com/user-attachments/assets/8b516b1c-3c7b-4f00-beb8-7d003d1dedf2)
-
-![screencapture-localhost-8501-2025-03-12-14_39_13](https://github.com/user-attachments/assets/04a790a7-e402-483a-b4d8-c8c470613a48)
-
