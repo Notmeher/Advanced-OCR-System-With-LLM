@@ -1,0 +1,255 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced OCR System with LLaMA Vision</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+        .processing-spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        #results-section {
+            display: none;
+        }
+        .api-status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .api-ready {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .api-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 500px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Advanced OCR System with LLaMA Vision</h1>
+        
+        <div class="mb-3">
+            <span class="api-status {{ 'api-ready' if 'Missing' not in api_status else 'api-error' }}">
+                {{ api_status }}
+            </span>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header">Input</div>
+                    <div class="card-body">
+                        <form id="ocr-form" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label class="form-label">File Type</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="file_type" id="image-radio" value="image" checked>
+                                        <label class="form-check-label" for="image-radio">Image</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="file_type" id="pdf-radio" value="pdf">
+                                        <label class="form-check-label" for="pdf-radio">PDF</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Upload File (Image or PDF)</label>
+                                <input type="file" class="form-control" id="file" name="file" accept=".jpg,.jpeg,.png,.pdf">
+                            </div>
+                            
+                            <div class="mb-3 pdf-options hidden">
+                                <label class="form-label">PDF Page Selection</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="page_selection" id="specific-page" value="specific" checked>
+                                        <label class="form-check-label" for="specific-page">Specific Page</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="page_selection" id="all-pages" value="all">
+                                        <label class="form-check-label" for="all-pages">All Pages</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 page-number-input">
+                                <label for="specific_page" class="form-label">Specific Page Number</label>
+                                <input type="number" class="form-control" id="specific_page" name="specific_page" value="1" min="1">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="prompt_template" class="form-label">LLaMA Vision Prompt Template</label>
+                                <textarea class="form-control" id="prompt_template" name="prompt_template" rows="7">I need to improve the text extracted using OCR from an image. Here's the raw OCR output:
+
+Please analyze the image and correct any OCR errors. Pay special attention to:
+1. Fixing misspelled words
+2. Correcting misrecognized characters
+3. Preserving the original formatting where possible
+4. Handling any unclear or ambiguous text based on context
+5. If you find any logo, don't process it
+6. Only correct words if they are misspelled
+
+Return only the corrected text without any explanations.</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="api_key" class="form-label">Groq API Key Override</label>
+                                <input type="password" class="form-control" id="api_key" name="api_key" placeholder="Leave empty to use environment variable">
+                                <button type="button" id="update-api-key" class="btn btn-secondary mt-2">Update API Key</button>
+                                <div id="api-key-status" class="mt-2"></div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Process File</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-7">
+                <div class="processing-spinner" id="processing-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="mt-2">Processing your file. This may take a moment...</p>
+                </div>
+                
+                <div id="results-section">
+                    <div class="card mb-3">
+                        <div class="card-header">Original Image</div>
+                        <div class="card-body text-center">
+                            <img id="original-image" class="image-preview" src="" alt="Original Image">
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            OCR Results
+                            <button id="download-btn" class="btn btn-sm btn-success float-end">Download Results</button>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="ocr-results" class="form-control" rows="15" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="error-message" class="alert alert-danger mt-3 hidden"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Toggle PDF options based on file type selection
+            $('input[name="file_type"]').change(function() {
+                if ($(this).val() === 'pdf') {
+                    $('.pdf-options').removeClass('hidden');
+                } else {
+                    $('.pdf-options').addClass('hidden');
+                }
+            });
+            
+            // Toggle page number input based on page selection
+            $('input[name="page_selection"]').change(function() {
+                if ($(this).val() === 'specific') {
+                    $('.page-number-input').removeClass('hidden');
+                } else {
+                    $('.page-number-input').addClass('hidden');
+                }
+            });
+            
+            // Handle API key update
+            $('#update-api-key').click(function() {
+                const apiKey = $('#api_key').val();
+                
+                $.ajax({
+                    url: '/update_api_key',
+                    type: 'POST',
+                    data: {
+                        'api_key': apiKey
+                    },
+                    success: function(response) {
+                        $('#api-key-status').html(`
+                            <div class="alert alert-${response.success ? 'success' : 'danger'} py-2">
+                                ${response.message}
+                            </div>
+                        `);
+                        
+                        // Clear status after 3 seconds
+                        setTimeout(function() {
+                            $('#api-key-status').html('');
+                        }, 3000);
+                    },
+                    error: function() {
+                        $('#api-key-status').html(`
+                            <div class="alert alert-danger py-2">
+                                Error communicating with server
+                            </div>
+                        `);
+                    }
+                });
+            });
+            
+            // Handle form submission
+            $('#ocr-form').submit(function(e) {
+                e.preventDefault();
+                
+                // Show processing spinner and hide results/errors
+                $('#processing-spinner').show();
+                $('#results-section').hide();
+                $('#error-message').addClass('hidden').text('');
+                
+                // Create FormData object
+                const formData = new FormData(this);
+                
+                // Submit the form data
+                $.ajax({
+                    url: '/process',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#processing-spinner').hide();
+                        
+                        if (response.error) {
+                            $('#error-message').removeClass('hidden').text(response.error);
+                            return;
+                        }
+                        
+                        // Display results
+                        $('#results-section').show();
+                        $('#original-image').attr('src', response.image_path);
+                        $('#ocr-results').val(response.result_text);
+                        
+                        // Setup download button
+                        $('#download-btn').off('click').on('click', function() {
+                            window.location.href = '/download/' + response.result_file;
+                        });
+                    },
+                    error: function() {
+                        $('#processing-spinner').hide();
+                        $('#error-message').removeClass('hidden').text('Error communicating with server');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
